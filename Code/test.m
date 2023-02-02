@@ -4,11 +4,11 @@ close all;
 
 load('meshes/voronoi.mat')
 u = vem('meshes/voronoi.mat',@square_domain_rhs, ...
-    @square_domain_boundary_condition)
-s = size(elements,1)
+    @square_domain_boundary_condition);
+s = size(elements,1);
 figure
 for i=1:s
-    disp(i)
+    disp(i);
     I = elements{i};
     V = vertices(I, :);
     C = complex(V(:,1),V(:,2));
@@ -22,3 +22,4 @@ for i=1:s
     end
     laplace(C,BCs,'tol',1e-6);
 end
+axis("square"), colorbar

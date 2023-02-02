@@ -300,9 +300,10 @@ if plots
    uu = u(zz); uu(~inpolygonc(zz,ww)) = nan;
    %axes(PO,[.52 .34 .47 .56])
    levels = linspace(min(G),max(G),100);
-   contour(sx,sy,uu,levels,LW,.5), colorbar, axis equal, hold on
+%   contour(sx,sy,uu,levels,LW,.5), colorbar, axis equal, hold on
+   contour(sx,sy,uu,levels,LW,.5), hold on
    plot(ww,'-k',LW,1)%, plot(pol,'.r',MS,6)
-   set(gca,FS,fs-1), axis(ax)
+%   set(gca,FS,fs-1), axis(ax)
 %    title(['dim(A) = ' int2str(M) ' x ' int2str(N) ' ', ...
 %        ' #poles = ' int2str(length(pol))],FS,fs,FW,NO), hold off
 end
