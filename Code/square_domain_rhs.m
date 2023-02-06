@@ -13,4 +13,5 @@ function f = square_domain_rhs(points)
 % AUTHOR: Oliver Sutton, 2016
 
 x = points(:, 1); y = points(:, 2);
-f = 15 * sin(pi * x) * sin(pi * y);
+%f = 15 * sin(pi * x) * sin(pi * y);
+f = 2*pi*pi *sin(pi*x)*sin(pi*y);

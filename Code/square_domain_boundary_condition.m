@@ -13,4 +13,5 @@ function g = square_domain_boundary_condition(points)
 % AUTHOR: Oliver Sutton, 2016
 
 x = points(:, 1); y = points(:, 2);
-g = (1 - x) .* y .* sin(pi * x);
+%g = (1 - x) .* y .* sin(pi * x);
+g = 0.*x + 0.*y;

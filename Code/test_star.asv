@@ -31,7 +31,7 @@ s = size(elements,1);                                                           
 figure
 for t = 1:s                                                                                          %For each element
 
-    %disp(t);
+    disp(t);
     I = elements{t};                                                                                 %Indexes of the nodes of the elements
     V = vertices(I, :);                                                                              %Coordinates of the vertices
     C = complex(V(:,1),V(:,2));                                                                      %Convert to complex numbers
@@ -68,29 +68,20 @@ for t = 1:s                                                                     
 
             u_cm(6*(t/5-1)+j,:) = u_vem(xc + 1i*yc);                                                 %Pointwise value with the conforming map
 
-            %Parte di codice deprecata
-            %B   = [xx(2) - xx(1), xx(3)- xx(1); yy(2) - yy(1), yy(3) - yy(1)];                       %Matrix transformation from the referal triangle 
-            %rif = B\([xc;yc] - [xx(1); yy(1)]);                                                      %Coordinate of the centroid in the referal triangle
+            B   = [xx(2) - xx(1), xx(3)- xx(1); yy(2) - yy(1), yy(3) - yy(1)];                       %Matrix transformation from the referal triangle 
+            rif = B\([xc;yc] - [xx(1); yy(1)]);                                                      %Coordinate of the centroid in the referal triangle
 
-            %u_int(6*(t/5-1)+j,:) = u(vv(1)) * (1 - rif(1) - rif(2)) ...                              %Pointwise value with the linear interpolant
-                                 %+ u(vv(2)) * rif(1) + u(vv(3)) * rif(2);
+            u_int(6*(t/5-1)+j,:) = u(vv(1)) * (1 - rif(1) - rif(2)) ...                              
+                                 + u(vv(2)) * rif(1) + u(vv(3)) * rif(2);
             
-            u_int(6*(t/5-1)+j,:) = mean([u(vv(1)); u(vv(2)); u(vv(3))]);
-
-            u_real(6*(t/5-1)+j,:) = sin(pi*xc(1))*sin(yc(1)*pi);                                     %Pointwise values of the real solution
+            u_real(6*(t/5-1)+j,:) = sin(pi*xc(1))*sin(yc(1)*pi);
            
         end
-
     end
-
 end
-
 axis("square"), colorbar
 
-fprintf('Number of squares in each row: %d\n',n);
-fprintf('Star deformation percentage:   %d\n\n', perc);
-fprintf('Error with the conforming map:     %f\n', mean(abs((u_cm  - u_real)./u_real)));
-fprintf('Error with the linear interpolant: %f\n', mean(abs((u_int - u_real)./u_real)));
+
 
 function [xc, yc] = centroid(x,y)
 

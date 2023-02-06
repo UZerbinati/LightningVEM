@@ -2,35 +2,25 @@ clear;
 clc;
 close all;
 
-load('meshes/voronoi.mat')
-u = vem('meshes/voronoi.mat',@square_domain_rhs, ...
-    @square_domain_boundary_condition)
-s = size(elements,1)
+meshname = 'meshes/star_3_1.mat';
+load(meshname)
+u = vem(meshname,@square_domain_rhs, ...
+    @square_domain_boundary_condition);
+s = size(elements,1);
 figure
-I = elements{1};
-V = vertices(I, :);
-C = complex(V(:,1),V(:,2));
-T = {@(z) linearBC(z,C(1),C(2),u(I(1)),u(I(2)))
-               @(z) linearBC(z,C(2),C(3),u(I(2)),u(I(3)))
-               @(z) linearBC(z,C(3),C(4),u(I(3)),u(I(4)))
-               @(z) linearBC(z,C(4),C(5),u(I(4)),u(I(5)))
-               @(z) linearBC(z,C(5),C(6),u(I(5)),u(I(6)))
-               @(z) linearBC(z,C(6),C(1),u(I(6)),u(I(1)))
-               };
-laplace(C,T);
 for i=1:s
+    disp(i);
     I = elements{i};
     V = vertices(I, :);
     C = complex(V(:,1),V(:,2));
     nBC = size(C,1);
     for j=1:nBC
         if j+1 <= nBC
-            disp([j,j+1])
-            BCs{j,1} = @(z) linearBC(z,C(j),C(j),u(I(j)),u(I(j)));
+            BCs{j,1} = @(z) linearBC(z,C(j),C(j+1),u(I(j)),u(I(j+1)));
         else
-            disp([j,1])
             BCs{j,1} = @(z) linearBC(z,C(j),C(1),u(I(j)),u(I(1)));
         end
     end
-    laplace(C,BCs);
+    laplace(C,BCs,'tol',1e-6);
 end
+axis("square"), colorbar
