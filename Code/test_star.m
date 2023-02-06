@@ -2,7 +2,14 @@ clear;
 clc;
 close all;
 
-meshname = 'meshes/star_2_5.mat';
+n    = 8;
+perc = 10;
+meshname = 'meshes/star_' + string(n) + '_' + string(perc) + '.mat';
+
+if(~isfile(meshname))
+    vem_star_domain(n,perc);
+end
+
 load(meshname)
 u = vem(meshname,@square_domain_rhs, ...
     @square_domain_boundary_condition);
