@@ -93,6 +93,7 @@ Such a construction has worked well for standard finite element discretisation b
 Another library such as MODULEF, resorts to the local construction of basis functions on each element.
 The local construction of VEM basis is the implementation price that one has to pay for the advantages of the lighenting VEM method, but as we will see the embarrassingly parallelizable nature of this operation will ultimately result in a cost-efficient scheme compared to standard VEM and FEM.
 \section{The virtual element space}
+\label{sec:VEM}
 Let us consider two Hilbert spaces $X,Y$ and a differential operator $Q$ that is linear and bounded.
 Given an element $f\in Y$ we consider the linear partial differential equation
 \begin{equation}
@@ -105,11 +106,13 @@ We further assume that the above operator equation can be recast in the form of 
 In particular, we will say that \eqref{eq:var} is the variational equation corresponding to \eqref{eq:strong} if $u$ solving \eqref{eq:strong} also solves \eqref{eq:var} and if it exists $u\in X$ that solves \eqref{eq:var} it is also a solution of \eqref{eq:strong}.
 With the hypothesis that the bilinear form $\mathcal{Q}(\cdot,\cdot)$ is coercive and continuous, the well-posedness of the variational problem comes from Lax-Milgram lemma, \cite{Evans}.
 \begin{remark}
+  \label{rmk:transportDiffusion}
   The typical example of the above type of partial differential equation is the transport-diffusion equation, i.e.
   \begin{align}
-      \Delta u + \gamma u = f \;\;&in\; \Omega,\label{eq:transportDiffusion}\\
-      u\equiv 0 \;\;& on\;\partial\Omega.\nonumber
+      -\Delta u + \gamma u = f \;\;&in\; \Omega,\label{eq:transportDiffusion}\\
+      u\equiv 0 \;\;& on\;\partial\Omega,\nonumber
   \end{align}
+  with $\gamma \in \mathbb{R}_{\geq 0}$.
   In particular we will assume $f\in \mathcal{L}^2(\Omega)$ and $u\in H^2(\Omega)$, where $\Omega\subset\mathbb{R}^2$ is a pre-compact domain with smooth boundary.
   The variational equation corresponding to \eqref{eq:transportDiffusion} is the following
   \begin{equation}
@@ -188,17 +191,18 @@ At this point, the theory of VEM and the lightning VEM method diverge slightly. 
 \section{The lightning approximation}
 The key idea behind the lightning VEM is to consider a different local discrete space which is obtained approximating $V_h^k(K)$ using rational functions with poles clustered exponentially close to the corners of $K$.
 For the sake of clarity, we will focus our discussion on the lowest order case, $k=1$, and choose $\mathcal{L}=-\nabla$. We will discuss in a later section how to deal with the case $k>1$ and the case where higher conformity is required.
-Thanks to the linearity of the Laplacian if $K$ has $N_k$ edges to construct $V_h^k(K)$ we are interested in solving $N_K(k+1)$ problems of the form
+Thanks to the linearity of the Laplacian if $K$ has $N_k$ edges to construct $V_h^k(K)$ we are interested in solving $2N_K-1$ problems of the form
 \begin{align}
     \Delta u_i^{(e)} = 0 \;\;&in\; \Omega,\label{eq:basisProblem}\\
     u_i^{(e)} = \varphi_i^{(e)} \;\; & on\;\partial\Omega.\nonumber
 \end{align}
-Ideally, if we are structured rectangular mesh we know how to solve this problem exactly.
+where $\varphi_1^{(e)},\varphi_2^{(e)}$ are basis functions for the space of linear polynomial on the edge $e$, extended to zero on the rest of $\partial K$.
+Ideally, if we are working with a structured rectangular mesh we know how to solve this problem exactly.
 As the geometry of $K$ gets more complicated we need to find an efficient way of solving \eqref{eq:basisProblem}.
 To slay this dragon we turn to the lightning Laplace solver presented in \cite{LighteningLaplace,LighteningLaplace2}.
 The idea behind the lightning Laplace method is to search for an approximation $\hat{u}_i^{(e)}$ of $u_i^{(e)}$ of the form,
 \begin{equation}
-	\hat{u}_i^{(e)} = \Re\bigg\{\sum_{j=0}^{N_P}\frac{a_j}{z-z_j}+\sum_{j=0}^{N_Z}b_j(z-z_*)^j\bigg\}. 
+	\hat{u}_i^{(e)} = \Re\bigg\{\sum_{j=0}^{N_P}\frac{a_j}{z-z_j}+\sum_{j=0}^{N_Z}b_j(z-z_*)^j\bigg\}.\label{eq:lightningFunctions} 
 \end{equation} 
 where $\{z_j\}_{j=1}^{N_P}$ and $z_*$ are points in the complex plane.
 Finding the optimal coefficients to minimize $\norm{\hat{u}_i^{(e)}-u_i^{(e)}}_{\mathcal{L}^\infty(K)}$ in general is a highly non-linear problem.
@@ -217,31 +221,73 @@ In particular, the $N_P$ poles are clustered exponentially closer to the corners
 		\norm{f-r}_{\mathcal{L}^\infty(K)} \leq C_K e^{-C\sqrt{N_P}}.
 	\end{equation}
 \end{lemma}
+Unfortunately, the previous Lemma only gives us the best approximation estimate for the lightning Lapalce method, which while acting as a strong indication that the lightning Laplace scheme will be able to converge to an extremely accurate solution, can't be applied in any straight forward manner to the problem of developing a priori error estimates.
+An idea might be to mimic the reasoning presented in \cite{Yuji} which allows providing an a priori error bound on a least square collection method in terms of Lebesgue constant and the best approximation estimate presented above. The reason why this is not a viable path is due the fact that we are here interested in $H^1$ error estimates, that can't be produced using the type of $\mathcal{L}^\infty$ bound related to the Lebesgue constant.
+To produce a priori error estimates for the overall scheme, we decide to proceed adaptively when it comes to the resolution of \eqref{eq:basisProblem} using the lightning Laplace method.
 The exact algorithm used to compute the solution $\hat{u}_i^{(e)}$ of \eqref{eq:localVEM} is presented in Algorithm \ref{alg:lightningLaplace} and we once again redirect the reader interested in more detail to \cite{LighteningLaplace}.
 \begin{algorithm}[h]
 \caption{
 	We compute the solution $\hat{u}_i^{(e)}$ of \eqref{eq:localVEM}.}
 	\label{alg:lightningLaplace}
 	\begin{algorithmic}[1]
-		\REQUIRE{$n_1,\;n_2,\;\dots$ such that $\sqrt{n_1},\;\sqrt{n_2},\;\dots$ is uniformly spread.}
+		\REQUIRE{$n_1,\;n_2,\;\dots$ such that $\sqrt{n_1},\;\sqrt{n_2},\;\dots$ is uniformly spread, a tolerance $\varepsilon$.}
 		\FOR{$n \in \{n_1,n_2,\dots\}$}
 			\STATE{Fix $N_P \approx nN_K$ and cluster the pole outside $K$ and exponentially close the corners;}
 			\STATE{Fix $z_*$ in the interior of $K$ and fix $N_Z \approx N_K$ elements of the monomial basis;}
 			\STATE{Choose $M=6N_P+6N_Z+1$ sample points on the boundary and clustered near the corners;}
-			\STATE{Evaluate at the sample points to obtain a matrix $A\in \mathbb{R}^{M\times (2N_P+2N_Z+1)}$ and $\vec{d}\in \mathbb{R}^{M}$;}
+			\STATE{Evaluate at the sample points $\varphi^{(e)}_i$ to obtain a matrix $A\in \mathbb{R}^{M\times (2N_P+2N_Z+1)}$ and $\vec{d}\in \mathbb{R}^{M}$;}
 			\STATE{Solve the least square problem $A\vec{x} \approx \vec{d}$ for the coefficients $\vec{x}=(\vec{a},\vec{b})$;}
-			\IF{$\norm{A\vec{x}-\vec{d}}\leq \varepsilon$}
+			\STATE{Construct the function $\hat{u}_i^{(e)} = \Re\bigg\{\sum_{j=0}^{N_P}\frac{a_j}{z-z_j}+\sum_{j=0}^{N_Z}b_j(z-z_*)^j\bigg\}$ using the coefficients $\vec{a}$ and $\vec{b}$;}
+			\IF{$\norm{\hat{u}_i^{(e)}-\varphi^{(e)}_i}_{H^{1/2}({\partial K})}\leq \varepsilon$}
 				\STATE{\textbf{break;}}
 			\ENDIF
 		\ENDFOR
-		\STATE{Construct the function $\hat{u}_i^{(e)}$ using the coefficients $\vec{a}$ and $\vec{b}$;}
 		\RETURN{$\hat{u}_i^{(e)}$.}
 	\end{algorithmic}
 \end{algorithm}
-Now we are interested in an a priori error estimate for $\norm{u_i^{(e)}-\hat{u}_i^{(e)}}_{L^2(\Omega)}$.
-To achieve this we first observe that since  $\sum_{j=0}^{N_P}\frac{a_j}{z-z_j}+\sum_{j=0}^{N_Z}b_j(z-z_*)^j$, it is analytic in the convex-hull described by the vertex of any polygonal element $K$ of the tessellation $\mathcal{T}_h$ where $z_j$ are the vertices of $K$, then its real part is a harmonic function.
+We then observe that since  $\sum_{j=0}^{N_P}\frac{a_j}{z-z_j}+\sum_{j=0}^{N_Z}b_j(z-z_*)^j$ is analytic in the convex-hull described by the vertex of any polygonal element $K$ of the tessellation $\mathcal{T}_h$ where $z_j$ are the vertices of $K$, then its real part is a harmonic function.
 We redirect the reader unfamiliar with this notion to \cite{Gilardi,Ahlfors}.
-
+Since $\hat{u}^{(e})_i$ is harmonic we know that the function defined as $\hat{u}_i^{(e)}-u_i^{(e)}$ is harmonic and applying  boundary regularity estimates for harmonic functions we obtain the following result,
+\begin{proposition}
+	Let $u^{(e)}_i$ be as in \eqref{eq:basisProblem} and $\hat{u}^{(e)}_i$ be the outcome of Algorithm \ref{alg:lightningLaplace}, then 
+	\begin{equation}
+		\norm{\hat{u}_i^{(e)}-u_i^{(e)}}_{H^1(K)}\leq C_1\varepsilon, \qquad \norm{\hat{u}_i^{(e)}-u_i^{(e)}}_{L^{\infty}(\partial K)}\leq C_2\varepsilon,\label{eq:lightningErrorEstimates}
+	\end{equation}
+	where the constants $C_1$ and $C_2$ only depends on $\Omega$ and $\partial\Omega$.
+\end{proposition}
+\begin{proof}
+	Since we assumed the elements $K$ of our tessellation $\mathcal{T}_h$ are polygonal, proof for the boundary estimates used to produce the first inequality in \eqref{eq:lightningErrorEstimates} can be found in \cite{Grisvard}.
+	The second estimate comes from the Morrey's inequality on a parametrization of the boundary.
+\end{proof}
+From now on we will adopt the notation $\hat{V}_h$ to express the discrete function space that is obtained from the solution of \eqref{eq:basisProblem} using the lightning Lapalce method.
+\section{The lightening virtual element method}
+In its essence, as previously said, the lightning virtual element method is a standard finite element method where the local basis function are computed solving \eqref{eq:basisProblem} using Algorithm \ref{alg:lightningLaplace}, as described in pseudocode in Algorithm \ref{alg:lightningVEM}.
+\begin{algorithm}[h]
+\caption{
+	We compute the solution $\hat{u}_i^{(e)}$ of \eqref{eq:localVEM}.}
+	\label{alg:lightningLaplace}
+	\begin{algorithmic}[1]
+		\REQUIRE{$n_1,\;n_2,\;\dots$ such that $\sqrt{n_1},\;\sqrt{n_2},\;\dots$ is uniformly spread, a tolerance $\varepsilon$.}
+		\FOR{$n \in \{n_1,n_2,\dots\}$}
+			\STATE{Fix $N_P \approx nN_K$ and cluster the pole outside $K$ and exponentially close the corners;}
+			\STATE{Fix $z_*$ in the interior of $K$ and fix $N_Z \approx N_K$ elements of the monomial basis;}
+			\STATE{Choose $M=6N_P+6N_Z+1$ sample points on the boundary and clustered near the corners;}
+			\STATE{Evaluate at the sample points $\varphi^{(e)}_i$ to obtain a matrix $A\in \mathbb{R}^{M\times (2N_P+2N_Z+1)}$ and $\vec{d}\in \mathbb{R}^{M}$;}
+			\STATE{Solve the least square problem $A\vec{x} \approx \vec{d}$ for the coefficients $\vec{x}=(\vec{a},\vec{b})$;}
+			\STATE{Construct the function $\hat{u}_i^{(e)} = \Re\bigg\{\sum_{j=0}^{N_P}\frac{a_j}{z-z_j}+\sum_{j=0}^{N_Z}b_j(z-z_*)^j\bigg\}$ using the coefficients $\vec{a}$ and $\vec{b}$;}
+			\IF{$\norm{\hat{u}_i^{(e)}-\varphi^{(e)}_i}_{H^{1/2}({\partial K})}\leq \varepsilon$}
+				\STATE{\textbf{break;}}
+			\ENDIF
+		\ENDFOR
+		\RETURN{$\hat{u}_i^{(e)}$.}
+	\end{algorithmic}
+\end{algorithm}
+\section{A priori error estimates} In this section we develop a priori error estimates for the problem of the form of \eqref{eq:strong}.
+In particular, we will limit our attention to the special case of the transport diffusion problem introduced in Remark \eqref{rmk:transportDiffusion} and $k=0$.
+This choice is motivated by the authors opinion that a practical treatment of the a priori error estimates, for this specific problem, would be more beneficial to the reader.
+Furthermore, a priori error estimates for other problem that verifies all the assumption introduced in section \ref{sec:VEM}, can be obtained following the same treatment here presented.
+\section{Numerical experiments}
+\section{Extensions of the lightning Virtual Element method}
 \section*{Acknowledgments}
 We would like to acknowledge the assistance of volunteers in putting
 together with this example manuscript and supplement.

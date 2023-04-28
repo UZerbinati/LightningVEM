@@ -120,8 +120,9 @@ for stepno = 1:maxstepno
       pol = [pol polk]; d = [d dk];
       J = [J k*ones(1,length(dk))];
       dvec = [(1/3)*dk (2/3)*dk dk];                % finer pts for bndry sampling
-      tt{k} = [tt{k} dvec(dvec<dw(k)) ...           % add clustered pts near corner
-          linspace(0,dw(k),max(30,nk))];            % additional pts along side
+      %tt{k} = [tt{k} dvec(dvec<dw(k)) ...           % add clustered pts near corner
+      %    linspace(0,dw(k),max(30,nk))];            % additional pts along side
+      tt{k} = [tt{k} linspace(0,dw(k),max(30,nk))];
       j = mod(k-2,nw)+1;                            % index of last corner
       tt{j} = [tt{j} dw(j)-dvec(dvec<dw(j))];       % likewise in other direction
    end

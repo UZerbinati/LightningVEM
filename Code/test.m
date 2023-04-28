@@ -2,7 +2,7 @@ clear;
 clc;
 close all;
 
-meshname = 'meshes/star_2_5.mat';
+meshname = 'meshes/voronoi.mat';
 load(meshname)
 u = vem(meshname,@square_domain_rhs, ...
     @square_domain_boundary_condition);
