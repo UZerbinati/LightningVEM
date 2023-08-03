@@ -10,6 +10,7 @@ f_global = zeros(siz, 1);
 domainMesh.polygon  = {1:domainMesh.npolygon};                                                       %Allocate memory for polygon information
 domainMesh.diameter = 0;                                                                             %Initialize diameter of the mesh
 
+time     = zeros(domainMesh.npolygon,1);
 connect  = domainMesh.connect;
 coords   = parallel.pool.Constant(domainMesh.coords);
 polygons = cell(domainMesh.npolygon,1);
@@ -17,16 +18,18 @@ K_loc    = cell(domainMesh.npolygon,1);
 f_loc    = cell(domainMesh.npolygon,1);
 
 %% CONSTRUCT THE LINEAR SYTEM
-parfor i = 1:domainMesh.npolygon
+for i = 1:domainMesh.npolygon
    
     local_vertex = connect{i,1};                                                                     %Get the vertex indexes of the i-th polygon
 
     vertex = coords.Value(local_vertex,:);
 
+    tic
     [K_loc{i}, f_loc{i}, polygons{i}] = vem_lighting_element(vertex, matProps, f, k);             %Assembly local stiffness matrix and load term
-    
+    time(i) = toc;
 end
 
+fprintf ("Average local assembly time: %f \n", mean(time))
 for i = 1:domainMesh.npolygon
     
     local_vertex = connect{i,1};

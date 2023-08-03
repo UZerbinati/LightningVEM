@@ -3,21 +3,21 @@ clear;
 close;
 clc;
 
-addpath("..\")                                                                                       %Path to user defined functions
-addpath("..\assembly\")
-addpath("..\chebfun\")
-addpath("..\elements\")
-addpath("..\errors\")
-addpath("..\evalutation\")
-addpath("..\matrices\")
-addpath("..\mesh_files\")
-addpath("..\preprocessing\")
-addpath("..\poly2D\")
-addpath("..\quadrature\")
-addpath("..\test\")
-addpath("..\utility")
+addpath("../")                                                                                       %Path to user defined functions
+addpath("../assembly/")
+addpath("../chebfun/")
+addpath("../elements/")
+addpath("../errors/")
+addpath("../evalutation/")
+addpath("../matrices/")
+addpath("../mesh_files/")
+addpath("../preprocessing/")
+addpath("../poly2D/")
+addpath("../quadrature/")
+addpath("../test/")
+addpath("../utility")
 
-tic 
+%tic 
 
 %% PRINT INITIAL MESSAGE
 fprintf('[%.2f] Solution of the Diffusiom - Reaction problem with Virtual Element Method ',toc);
@@ -26,7 +26,7 @@ fprintf('\n-eps * div(grad(u)) + sigma * u = f')
 %% PARAMETERS OF THE PDE
 matProps.sigma   = 1;                                                                                %Reaction  coefficient
 matProps.epsilon = 1;                                                                                %Diffusion coefficient
-matProps.tol     = 1e-2;                                                                             %Tolerance of Laplace
+matProps.tol     = 1e-6;                                                                             %Tolerance of Laplace
 matProps.h       = 1e-7;                                                                             %Step for the Finite Difference
 matProps.beta{1}    = @(x,y) -2*pi.*sin(pi.*(x + 2*y));
 matProps.beta{2}    = @(x,y)    pi.*sin(pi.*(x + 2*y));
@@ -50,7 +50,7 @@ fprintf('\n\n[%.2f] Starting the method... \n',toc);
 %% READ THE MESH
 fprintf('[%.2f] Reading a mesh...\n',toc);
 
-mesh_filename = 'polygon_64.txt';  
+mesh_filename = 'polygon_16.txt';  
 domainMesh    = read_mesh(mesh_filename);                                                            %Read mesh
 
 %% OBTAIN INFORMATION ON THE MESH

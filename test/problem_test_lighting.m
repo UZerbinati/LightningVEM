@@ -55,13 +55,13 @@ switch(k)
 
     case(3)
                 
-        u = @(x,y) exp(x+3*y);
+        u = @(x,y) sin(pi.*x).*sin(pi.*y) + log (1 + x.*y);
                  
-        deru_x = @(x,y) exp(x+3*y);
-        deru_y = @(x,y) 3*exp(x+3*y);
+        deru_x = @(x,y) pi.*cos(pi.*x).*sin(pi.*y) + y ./ (1 + x.*y);
+        deru_y = @(x,y) pi.*cos(pi.*y).*sin(pi.*x) + x ./ (1 + x.*y);
                 
-        u_xx = @(x,y) exp(x+3*y);
-        u_yy = @(x,y) 9*exp(x+3*y);
+        u_xx = @(x,y) -pi.*pi.*sin(pi.*x).*sin(pi.*y) - y.^2 ./ ((1 + x.*y).^2);
+        u_yy = @(x,y) -pi.*pi.*sin(pi.*x).*sin(pi.*y) - x.^2 ./ ((1 + x.*y).^2);
         
     case(4)
                 

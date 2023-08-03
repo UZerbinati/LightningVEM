@@ -50,7 +50,8 @@ for i = 1 : polygon.nedges
 
     end                                                                                              
 
-    [u_vem{i}, ~, f_vem{i}, ~, ~, ~] = laplace(coords(1:end-1),BCs,'tol',matProps.tol,'noplots');    %Construct the basis function associated to the DOF
+    [u_vem{i}, f_vem{i}, ~, ~, ~] = lightningLaplace(coords(1:end-1),BCs,'tol',matProps.tol,'beta', max(polygon.angles)/pi,'noplots','noarnoldi');    %Construct the basis function associated to the DOF
+    %[u_vem{i}, f_vem{i}, ~, ~, ~] = lightningLaplace(coords(1:end-1),BCs,'tol',matProps.tol,'beta', pi/2,'noplots','noarnoldi');    %Construct the basis function associated to the DOF
 
     %Second type of DOFs
     for j = 1:k-1                                                                                    
@@ -65,7 +66,7 @@ for i = 1 : polygon.nedges
         polyf    = polyfit(lobatto, zeros_vec, k);
         BCs{i,1} = @(z) polyval(polyf,arclength(z));
 
-        [u_vem{index}, ~, f_vem{index}, ~, ~, ~] = laplace(coords(1:end-1),BCs,'tol',matProps.tol,'noplots');
+        [u_vem{index}, ~, f_vem{index}, ~, ~, ~] = lightingLaplace(coords(1:end-1),BCs,'tol',matProps.tol,'noplots');
 
     end
 

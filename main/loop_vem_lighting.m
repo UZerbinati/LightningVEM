@@ -3,19 +3,19 @@ clear;
 close;
 clc;
 
-addpath("..\")                                                                                       %Path to user defined functions
-addpath("..\assembly\")
-addpath("..\chebfun\")
-addpath("..\elements\")
-addpath("..\errors\")
-addpath("..\evalutation\")
-addpath("..\matrices\")
-addpath("..\mesh_files\")
-addpath("..\preprocessing\")
-addpath("..\poly2D\")
-addpath("..\quadrature\")
-addpath("..\test\")
-addpath("..\utility")
+addpath("../")                                                                                       %Path to user defined functions
+addpath("../assembly/")
+addpath("../chebfun/")
+addpath("../elements/")
+addpath("../errors/")
+addpath("../evalutation/")
+addpath("../matrices/")
+addpath("../mesh_files/")
+addpath("../preprocessing/")
+addpath("../poly2D/")
+addpath("../quadrature/")
+addpath("../test/")
+addpath("../utility")
 
 tic
 
@@ -24,12 +24,12 @@ fprintf('[%.2f] Solution of the Diffusiom - Reaction problem with Virtual Elemen
 fprintf('\n-eps * div(grad(u)) + sigma * u = f')              
 
 %% PARAMETERS OF THE PDE
-matProps.sigma   = 0;                                                                                %Reaction  coefficient
+matProps.sigma   = 1;                                                                                %Reaction  coefficient
 matProps.epsilon = 1;                                                                                %Diffusion coefficient
-matProps.tol     = 1e-6;                                                                             %Tolerance of Laplace
+matProps.tol     = 1e-4;                                                                             %Tolerance of Laplace
 matProps.h       = 1e-7;                                                                             %Step for the Finite Difference
-matProps.beta{1}    = @(x,y) 0 + 0.*x + 0.*y;
-matProps.beta{2}    = @(x,y) 0 + 0.*x + 0.*y;
+matProps.beta{1}    = @(x,y) -2*pi.*sin(pi.*(x + 2*y));
+matProps.beta{2}    = @(x,y)    pi.*sin(pi.*(x + 2*y));
 
 
 fprintf('\n\nParameters: ')  
@@ -38,7 +38,7 @@ fprintf('\nSigma   =  %.2f', matProps.sigma)
 
 
 %% DEFINITION OF THE FUNCTIONS
-[f, g, u, grad_u_x, grad_u_y] = problem_test_lighting(2,matProps);                                   %Obtain problem functions
+[f, g, u, grad_u_x, grad_u_y] = problem_test_lighting(3,matProps);                                   %Obtain problem functions
 
 %% INFORMATION ON THE POLYNOMIALS
 k = 1;                                                                                               %Degree of the polynomials used to solve the equation
@@ -47,8 +47,8 @@ polynomial = get_polynomial_info(k);
 fprintf('\nPolynomials degree for solving the equation: %d',k)
 
 %% INPUT OF THE MESH FILE NAME     
-%mesh = ["polygon_4.txt" "polygon_16.txt" "polygon_64.txt" "polygon_256.txt" "polygon_1024.txt" "polygon_4096.txt"];
-mesh = ["square_4.txt" "square_16.txt" "square_64.txt" "square_256.txt" "square_1024.txt" "square_4096.txt"];
+mesh = ["polygon_4.txt" "polygon_16.txt" "polygon_64.txt" "polygon_256.txt"]% "polygon_1024.txt"];
+%mesh = ["square_4.txt" "square_16.txt" "square_64.txt" "square_256.txt" "square_1024.txt" "polygon_4096.txt" ];
 %mesh = ["polygon_4.txt" "polygon_16.txt" "polygon_64.txt" "polygon_256.txt"];
 
 %% INITIALIZE MEMORY
@@ -143,19 +143,17 @@ end
 
 %% PLOT OF THE EOC
 
-figure(1)
-title("L2")
-loglog(diamvec,errL2vec,'r*-','LineWidth',2,'MarkerSize',10)
+loglog(diamvec,errL2vec,'r*-','LineWidth',2, 'MarkerSize', 10)
 hold on
-loglog(diamvec,diamvec.^(k+1)./2,'k-','LineWidth',3)
-axis("square")
-
-figure(2)
-title("H1")
-loglog(diamvec,errH1vec,'r*-','LineWidth',2,'MarkerSize',10)
-hold on
-loglog(diamvec,diamvec.^k, 'k-','LineWidth',3)
-axis("square")
-
-eocL2 = log(errL2vec(1:end-1) ./ errL2vec(2:end)) ./ log(2);
-eocH1 = log(errH1vec(1:end-1) ./ errH1vec(2:end)) ./ log(2);
+loglog(diamvec,errH1vec,'b*-','LineWidth',2, 'MarkerSize', 10)
+loglog(diamvec,diamvec,'k--','LineWidth',2, 'MarkerSize', 10)
+loglog(diamvec,diamvec.^2/12,'k--','LineWidth',2, 'MarkerSize', 10)
+txt = texlabel('$O(h)$');   
+text(diamvec(end),diamvec(end)*0.7,txt,'interpreter','latex','HorizontalAlignment','center')
+txt = texlabel('$O(h^2)$');   
+text(diamvec(end),diamvec(end).^2/15*0.9,txt,'interpreter','latex','HorizontalAlignment','center')
+grid on
+axis square
+legend("L2", "H1")
+xlabel('$h$','interpreter','latex')
+ylabel('error','interpreter','latex')

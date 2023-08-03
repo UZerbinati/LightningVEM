@@ -37,10 +37,13 @@ function [polygon] = get_polygon_info(vertex)
     polygon.nedges    = (numel(vertex) - 2) / 2;                                                     %Number of edges
     polygon.area      = 0;                                                                           %Area of the polygon
     polygon.edges     = zeros(polygon.nedges, 1);                                                    %Edges length
+    polygon.angles     = zeros(polygon.nedges, 1);
     polygon.vnormal   = zeros(polygon.nedges, 2);                                                    %Normal vectors
     polygon.centroid  = [0 0];                                                                       %Centroid
     polygon.diameter  = 0;                                                                           %Diameter of the polygon
-   
+    
+    V = [vertex(end-1,:); vertex];
+
     for i=1:polygon.nedges
         
         polygon.area          = polygon.area + vertex(i,1) * vertex(i+1,2) ...
@@ -72,7 +75,6 @@ function [polygon] = get_polygon_info(vertex)
         end
 
     end
-    
     polygon.perimeter = sum(polygon.edges);
     polygon.area = polygon.area/2;
     
@@ -83,5 +85,10 @@ function [polygon] = get_polygon_info(vertex)
     end
     
     polygon.centroid  = polygon.centroid / (6 * polygon.area);
+
+    for k = 2:size(V,1)-1
+        anglr = [(atan2(V(k-1,2)-V(k,2), V(k-1,1)-V(k,1))); (atan2(V(k+1,2)-V(k,2), V(k+1,1)-V(k,1)))];  % Calculate Radian Angles
+        polygon.angles(k-1) = mod(2*pi-diff(anglr),2*pi);                                                      % Reduce Radian Angles
+    end
 
 end
