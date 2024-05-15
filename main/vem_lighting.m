@@ -1,56 +1,63 @@
+% vem_lighting: This function computes the numerical solution of the PDE
+% -eps * div(grad(u)) + beta * grad(u) + sigma * u = f
+% using virtual element method (VEM).
+%
+% The basis functions of the virtual element space are computed using the lighting technique.
+%
+% The user can set the parameters of the PDE in lines 29-32.
+%
+% The test problem is set in line 43.
+% 
+% The mesh is selected in line 61. The meshes are constructed using VEMLAB 2.4  
+% (https://camlab.cl/software/vemlab/) and the functions plot_mesh2d and
+% read_mesh are from that software.
+
 %% INITIALIZATION
-clear; 
-close;
-clc;
+clear; close; clc;
 
-addpath("../")                                                                                       %Path to user defined functions
-addpath("../assembly/")
-addpath("../chebfun/")
-addpath("../elements/")
-addpath("../errors/")
-addpath("../evalutation/")
-addpath("../matrices/")
-addpath("../mesh_files/")
-addpath("../preprocessing/")
-addpath("../poly2D/")
-addpath("../quadrature/")
-addpath("../test/")
-addpath("../utility")
+fix_path();
 
-%tic 
+tic 
 
 %% PRINT INITIAL MESSAGE
-fprintf('[%.2f] Solution of the Diffusiom - Reaction problem with Virtual Element Method ',toc);
-fprintf('\n-eps * div(grad(u)) + sigma * u = f')              
+fprintf('[%.2f] Solution of the Advection - Diffusiom - Reaction problem with VEM ',toc);
+fprintf('\n-eps * div(grad(u)) + beta * grad(u) + sigma * u = f')              
 
 %% PARAMETERS OF THE PDE
-matProps.sigma   = 1;                                                                                %Reaction  coefficient
+matProps.sigma   = 0;                                                                                %Reaction  coefficient
 matProps.epsilon = 1;                                                                                %Diffusion coefficient
-matProps.tol     = 1e-6;                                                                             %Tolerance of Laplace
-matProps.h       = 1e-7;                                                                             %Step for the Finite Difference
-matProps.beta{1}    = @(x,y) -2*pi.*sin(pi.*(x + 2*y));
-matProps.beta{2}    = @(x,y)    pi.*sin(pi.*(x + 2*y));
+matProps.beta{1} = @(x,y) 0.*x + 0.*y;
+matProps.beta{2} = @(x,y) 0.*x + 0.*y;
 
-fprintf('\n\nParameters: ')  
-fprintf('\nEpsilon =  %.2f', matProps.epsilon)
-fprintf('\nSigma   =  %.2f', matProps.sigma)
+beta1      = func2str(matProps.beta{1});                                                             %Convert functions to string
+beta2      = func2str(matProps.beta{2});
+beta1(1:6) = [];                                                                                     %Remove @(x,y) 
+beta2(1:6) = [];
 
+fprintf('\n\nParameters: ')                                                                          %Print the parameters of the PDE 
+fprintf('\nEpsilon =  %.2f\n',matProps.epsilon)
+disp(['Beta    = [ ' beta1 ' ; ' beta2 ' ]'])
+fprintf('Sigma   =  %.2f\n',matProps.sigma)
 
 %% DEFINITION OF THE FUNCTIONS
-[f, g, u, grad_u_x, grad_u_y] = problem_test_lighting(2,matProps);                                   %Obtain problem functions
+[f, g, u, grad_u_x, grad_u_y] = problem_test_lighting(1,matProps);                                   %Obtain problem functions
 
 %% INFORMATION ON THE POLYNOMIALS
 k = 1;                                                                                               %Degree of the polynomials used to solve the equation
 
-polynomial = get_polynomial_info(k);
+%polynomial = get_polynomial_info(k);
 fprintf('\nPolynomials degree for solving the equation: %d',k)
+
+if (k ~= 1)
+    error("Actually, the method only works with k = 1")
+end
+
 %% PRINT INIT MESSAGE TO SCREEN
 fprintf('\n\n[%.2f] Starting the method... \n',toc);
 
 %% READ THE MESH
 fprintf('[%.2f] Reading a mesh...\n',toc);
-
-mesh_filename = 'polygon_16.txt';  
+mesh_filename = 'polygon_1024.txt';  
 domainMesh    = read_mesh(mesh_filename);                                                            %Read mesh
 
 %% OBTAIN INFORMATION ON THE MESH
@@ -68,7 +75,7 @@ plot_mesh2d(domainMesh);                                                        
                                                                        
 %% ASSEMBLYING DIFFUSION CONVECTION MATRIX
 fprintf('[%.2f] Assemblying element matrices...\n',toc); 
-[K_global, f_global, domainMesh] = vem_lighting_assembly(domainMesh, matProps, polynomial, f, k);
+[K_global, M_global, f_global, domainMesh] = vem_lighting_assembly(domainMesh, matProps, f, k);
 
 %% CONVERTING SYSTEM MATRIX TO A SPARSE MATRIX
 A = sparse(K_global);
@@ -78,8 +85,6 @@ fprintf('[%.2f] Enforcing Dirichlet boundary conditions...\n',toc);             
 
 f_global(boundary_vertex)  = g(domainMesh.coords(boundary_vertex,1), ...                            
                                domainMesh.coords(boundary_vertex,2));
-f_global(boundary_intdofs) = g(domainMesh.intcoords(boundary_intdofs-domainMesh.nvertex,1), ...
-                               domainMesh.intcoords(boundary_intdofs-domainMesh.nvertex,2));
 
 %% SOLVE THE SYSTEM
 fprintf('[%.2f] Solving system of linear equations...\n',toc);  
@@ -92,24 +97,21 @@ fI  = f_global(internal_dofs);                                                  
 UB  = f_global(boundary_dofs);                                                                       %Force boundary values
 UI  = AII \ (fI - AIB * UB);                                                                         %Solve system
 
+MII = M_global(internal_dofs,internal_dofs);
 U                = zeros(size(A,1),1);                                                               %Solution vector
 U(internal_dofs) = UI;
 U(boundary_dofs) = UB;
 
 U_ex                           = zeros(domainMesh.nvertex + domainMesh.nedges * (k-1), 1);           %Exact solution
 U_ex(1:domainMesh.nvertex)     = u(domainMesh.coords(:,1),domainMesh.coords(:,2));
-U_ex(domainMesh.nvertex+1:end) = u(domainMesh.intcoords(:,1),domainMesh.intcoords(:,2));
 
 %% ERRORS COMPUTATION
 fprintf('[%.2f] Computing errors...\n',toc);
-[errL2, errH1] = compute_errors_lighting(domainMesh, U, u, grad_u_x, grad_u_y, k, matProps.h);
+[errL2, errH1] = compute_errors_lighting(domainMesh, U, u, grad_u_x, grad_u_y, k);
 
-errLinf = max(abs(U(1:domainMesh.nvertex)-U_ex));
-
-fprintf("[%.2f] Errors computed: ",toc)
+fprintf("\n[%.2f] Errors computed: ",toc)
 fprintf("\nL2 norm    : %f", errL2)
-fprintf("\nH1 seminorm: %f", errH1)
-fprintf("\nLinf norm  : %f\n", errLinf)
-%fprintf("\nCondition  : %f\n\n", condest(K_global))
+fprintf("\nH1 seminorm: %f\n", errH1)
 
-toc
+save("A.mat",'AII')
+save("B.mat",'MII')

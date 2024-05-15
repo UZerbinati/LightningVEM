@@ -20,11 +20,6 @@ function [P0] = projection_P0(base_val_bound, polynomial, polygon)
 % ======
 % P0 : The integral mean
 %
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% May.  7, 2022: first realease (by M. Trezzi)
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 P0      = zeros(1,polynomial.dim);                                                                   %Memory allocation

@@ -23,11 +23,6 @@ function [b_quad] = boundary_quadrature(polygon, n)
 %        y : y-coordinates
 %        w : The weights of the quadrature
 %
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% Mai  7, 2022: first realease (by M. Trezzi)
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
 
 

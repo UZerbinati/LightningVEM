@@ -21,11 +21,6 @@ function [H] = vem_matrix_H(base_val_int, p_quad, polynomial)
 % ======
 % H : The matrix H
 %
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% May.  7, 2022: first realease (by M. Trezzi)
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 H = zeros(polynomial.dim, polynomial.dim);

@@ -24,11 +24,6 @@ function [errL2, errH1, values] = compute_errors(domainMesh, polynomial, U, u, d
 % errL2 : L2 norm of the error
 % errH1 : H1 seminorm of the error
 %
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% May  07, 2022: first realease (by M. Trezzi)
-%      
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     errL2 = 0;
@@ -45,12 +40,12 @@ function [errL2, errH1, values] = compute_errors(domainMesh, polynomial, U, u, d
              .* ((y - polygon.centroid(2)) ./ polygon.diameter).^k(:,2);
         grad = @(x,y,k) grad_fun(x,y,k,polygon);
 
-        base_val   = base_evalutation_interior(p_quad, polynomial, domainMesh.polygon{i});           %Evalutations of the basis function
-        grad_val   = grad_evalutation_interior(base_val, p_quad, polynomial, domainMesh.polygon{i});
+        base_val   = base_evaluation_interior(p_quad, polynomial, domainMesh.polygon{i});            %evaluations of the basis function
+        grad_val   = grad_evaluation_interior(base_val, p_quad, polynomial, domainMesh.polygon{i});
 
-        u_val      = f_evalutation_interior(u,      p_quad);                                         %Evalutations of the analytic solution
-        deru_x_val = f_evalutation_interior(deru_x, p_quad);
-        deru_y_val = f_evalutation_interior(deru_y, p_quad);
+        u_val      = f_evaluation_interior(u,      p_quad);                                          %evaluations of the analytic solution
+        deru_x_val = f_evaluation_interior(deru_x, p_quad);
+        deru_y_val = f_evaluation_interior(deru_y, p_quad);
 
         Pistar = polygon.G \ (polygon.B * U(polygon.local_dofs));                                    %Coefficients of the Pistar projection
 
@@ -59,7 +54,7 @@ function [errL2, errH1, values] = compute_errors(domainMesh, polynomial, U, u, d
 
         P0 = polygon.H \ (polygon.C * U(polygon.local_dofs));                                        %Coefficients of the Pistar projection
 
-        P0_val = Pi_evaluate(P0, base_val);                                                          %Evalutations of the Pistar projection
+        P0_val = Pi_evaluate(P0, base_val);                                                          %evaluations of the Pistar projection
         
         diff_sq      = (u_val - P0_val).^2;                                                      %Integrands
         diff_sq_grad = (deru_x_val - derPistar_val_x).^2 ...

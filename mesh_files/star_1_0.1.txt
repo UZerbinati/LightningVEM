@@ -1,0 +1,33 @@
+# domain type
+RectangularDomain
+# nodal coordinates: number of nodes followed by the coordinates
+12
+0.0000000000000000 0.0000000000000000
+1.0000000000000000 0.0000000000000000
+1.0000000000000000 1.0000000000000000
+0.0000000000000000 1.0000000000000000
+0.5000000000000000 0.0000000000000000
+1.0000000000000000 0.5000000000000000
+0.5000000000000000 1.0000000000000000
+0.0000000000000000 0.5000000000000000
+0.4995000000000000 0.4995000000000000
+0.5004999999999999 0.4995000000000000
+0.5004999999999999 0.5004999999999999
+0.4995000000000000 0.5004999999999999
+# element connectivity: number of elements followed by the connectivity (each line: nodes_per_element(nel) node1 node 2 ... node_nel)
+5
+4 1 5 9 8 
+4 2 6 10 5 
+4 3 7 11 6 
+4 4 8 12 7 
+8 5 10 6 11 7 12 8 9 
+# indices of nodes located on the bottom boundary
+1 2 5 
+# indices of nodes located on the top boundary
+3 4 7 
+# indices of nodes located on the left boundary
+1 4 8 
+# indices of nodes located on the right boundary
+2 3 6 
+# xmin, xmax, ymin, ymax of the bounding box
+0 1 0 1

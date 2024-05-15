@@ -1,35 +1,21 @@
 function [p_quad] = polygon_quadrature(polygon, n)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FUNCTION: polygon_quadrature
+% polygon_quadrature: this function constructs a quadrature that is exact of order 2n-1 for 
+%                     a polygon. For the construction see A. Sommariva, M.
+%                     Vianello "Product Gauss cubature over polygons on
+%                     Green's integration formula"
 %
-% Created by : M. Trezzi
+% Input parameters:
+% polygon: the polygon
+%       n: number of nodes for the 1D Gauss quadrature.
 %
-%---------------------------------------------------------------------------------------------------
-% Purpose
-% =======
-% This function constructs a quadrature that is exact of order 2n-1 for a polygon
-%
-% Input
-% =====
-% polygon : The polygon
-% n       : Number of nodes for the 1D Gauss quadrature
-%
-% Output
-% ======
-% p_quad : A struct that contains the following fields
+% Output parameters:
+% p_quad: a struct that contains the following fields
 %        
 %        bool  : An array where 1 indicates that the edges is in the quadrature
 %        xi    : x-coordinates
 %        eta   : y-coordinates
 %        omega : The weights of the quadrature
-%
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% Mai  7, 2022: first realease (by M. Trezzi)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
 
 %% OBTAIN THE INDEXES I
 vertex = polygon.vertex;

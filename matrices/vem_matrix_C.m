@@ -23,11 +23,6 @@ function [C] = vem_matrix_C(base_val_int, Pi, p_quad, polynomial, polygon)
 % ======
 % C : The matrix C
 %
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% May.  7, 2022: first realease (by M. Trezzi)
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
 
 C = zeros(polynomial.dim, polygon.size);

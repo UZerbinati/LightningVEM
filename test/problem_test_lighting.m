@@ -1,35 +1,18 @@
 function [f, g, u, deru_x, deru_y] = problem_test_lighting(k, matProps)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FUNCTION: problem_test
+% problem_test_lighting: this function defines the problem that we want to
+% solve
 %
-% Created by : M. Trezzi
+% Input parameters: 
+% k       : The index of the problem that we want to solve;
+% matProps: This struct contains the constants of the equation.
 %
-%---------------------------------------------------------------------------------------------------
-% Purpose
-% =======
-% This function returns the function related to the equation that we want
-% to solve
-%
-% Input
-% =====
-% k        : The index of the problem that we want to solve
-% matProps : This struct contains the constants of the equation
-%
-% Output
-% ======
-% f      : Right-hand side of the problem
-% g      : Boundary condition
-% u      : Solution of the equation
-% deru_x : x-derivative of u
-% deru_y : y-derivative of u
-%      
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% Mai  7, 2022: first realease (by M. Trezzi)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+% Output parameters:
+% f      : right-hand side of the problem;
+% g      : boundary condition;
+% u      : solution of the equation;
+% deru_x : x-derivative of u;
+% deru_y : y-derivative of u.
 
 switch(k)
         

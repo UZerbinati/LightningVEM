@@ -1,37 +1,19 @@
 function [domainMesh] = add_edges(domainMesh,k) 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FUNCTION: add_edges 
+% add_edges: this function adds the information relative to the edges to the struct domainMesh
 %
-% Created by : M. Trezzi
+% Input parameters:
+% domainMesh: the struct relative to the mesh of which we want the information;
+%          k: degree of the polynomials that will be used.
 %
-%---------------------------------------------------------------------------------------------------
-% Purpose
-% =======
-% This function adds the information relative to the edges to the struct domainMesh
-%
-% Input
-% =====
-% domainMesh : The struct relative to the mesh of which we want the information
-% k          : Degree of the polynomials that will be used
-%
-% Output
-% ======
-% domainMesh : The struct now contains also the following fields:
-%
-%        adj    : Each row contains the two elements adjacent to the edge
-%        edges  : A sparse upper triangular matrix in  which we store in  (i,j) the index of the 
-%                 edge joinin i and j (if it exists)
-%        length : The lenghts of the edges
-%        map    : A matrix in which we store in the i-th row the vertices joined by the i-th edge
-%        nedges : The number of edges
-%
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% Mai  7, 2022: first realease (by M. Trezzi)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+% Output parameters:
+% domainMesh: the struct now contains also the following fields:
+%        adj: each row contains the two elements adjacent to the edge
+%      edges: a sparse upper triangular matrix in  which we store in  (i,j) the index of the 
+%             edge joinin i and j (if it exists)
+%     length: the lenghts of the edges
+%        map: a matrix in which we store in the i-th row the vertices joined by the i-th edge
+%     nedges: the number of edges
 
 domainMesh.edges     = sparse(domainMesh.nvertex, domainMesh.nvertex);                               %Initialization
 domainMesh.map       = zeros(4 * domainMesh.nvertex, 2);                                             %Number of edges is usually lower than 4 * nvertex

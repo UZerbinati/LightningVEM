@@ -17,7 +17,7 @@ function create_quadrilateral_mesh
   
   xmin=0; xmax=1; 
   ymin=0; ymax=1;
-  ndiv_x=5; ndiv_y=5; % number of divisions along x and y coordinates
+  ndiv_x=50; ndiv_y=50; % number of divisions along x and y coordinates
   mesh_type='uniform';  % 'uniform'
   mesh_filename='patch_test_q4_uniform_5x5elems.txt'; 
   

@@ -1,5 +1,14 @@
 function x = lobatto_points_1d(n)
 
+% lobatto_points_1d: this function returns the quadrature points of the
+%                    Lobatto's rule.
+%
+% Input parameters:
+% n: number of nodes for the quadrature.
+%
+% Output parameters:
+% x: the points.
+
 x = ones(1,n);
 
 switch n

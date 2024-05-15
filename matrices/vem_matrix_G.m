@@ -25,11 +25,6 @@ function [G] = vem_matrix_G(base_val_bound, grad_val_int, p_quad, polynomial, po
 % ======
 % G : The matrix G
 %
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% May.  7, 2022: first realease (by M. Trezzi)
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 dim = polynomial.dim;                                                                                %Memory allocation

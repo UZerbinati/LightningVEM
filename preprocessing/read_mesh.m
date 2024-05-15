@@ -1,5 +1,4 @@
 function domainMesh = read_mesh(meshFile)
-%fprintf('Reading a mesh...\n');
 
 %% READ DOMAIN TYPE 
 mesh_file   = fopen(meshFile);                                              %Open mesh file

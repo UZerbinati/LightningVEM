@@ -21,11 +21,6 @@ function [D] = vem_matrix_D(base, polynomial, polygon, p_quad, base_val)
 % ======
 % D : The matrix D
 %
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% May.  7, 2022: first realease (by M. Trezzi)
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 D = zeros(polygon.size, polynomial.dim);

@@ -22,11 +22,6 @@ function [B] = vem_matrix_B(grad_val_bound, polynomial, polygon)
 % ======
 % B : The matrix B
 %
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% May.  7, 2022: first realease (by M. Trezzi)
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 B       = zeros(polynomial.dim, polygon.size);

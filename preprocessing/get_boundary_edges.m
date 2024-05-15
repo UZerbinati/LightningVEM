@@ -1,30 +1,13 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FUNCTION: get_boundary_edges 
-%
-% Created by : M. Trezzi
-%
-%---------------------------------------------------------------------------------------------------
-% Purpose
-% =======
-% Returns the indices of the edges on the boundary 
-%
-% Input
-% =====
-% domainMesh : Mesh of which we want the boundary edges
-%
-% Output
-% ======
-% boundary_edges : Array containing the indices of the boundary edges
-%
-%---------------------------------------------------------------------------------------------------
-% Function's updates history
-% ==========================
-% May  7, 2022: first realease (by M. Trezzi)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-
 function [boundary_edges] = get_boundary_edges(domainMesh)
-        
+
+% get_boundary_edges: returns the indices of the edges on the boundary 
+%
+% Input parameters
+% domainMesh: mesh of which we want the boundary edges
+%
+% Output parameters
+% boundary_edges: array containing the indices of the boundary edges
+
     top    = sort_boundary_edges_top(domainMesh.coords, domainMesh.boundary_nodes.top);              %Sort the vertices on the top boundary
                                      
     bottom = sort_boundary_edges_bottom(domainMesh.coords, domainMesh.boundary_nodes.bottom);        %Sort the vertices on the bottom boundary
@@ -39,7 +22,7 @@ function [boundary_edges] = get_boundary_edges(domainMesh)
     left_boundary   = get_edges(domainMesh.edges, left)';
     right_boundary  = get_edges(domainMesh.edges, right)';
     
-    boundary_edges = [top_boundary(1:end-1) bottom_boundary(1:end-1) ...                             %Assembly the result array
+    boundary_edges = [top_boundary(1:end-1)  bottom_boundary(1:end-1) ...                            %Assembly the result array
                       left_boundary(1:end-1) right_boundary(1:end-1)]';
     
 end
