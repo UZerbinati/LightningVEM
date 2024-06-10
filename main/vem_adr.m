@@ -102,15 +102,10 @@ internal_dofs = setdiff(1:size(A1,1), boundary_dofs);                           
 A = A1 + A2;
 AII = A(internal_dofs,internal_dofs);                                                                %Matrix internal - internal
 
-
 A1 = A1(internal_dofs,internal_dofs);
 A2 = A2(internal_dofs,internal_dofs);
 B1 = B1(internal_dofs,internal_dofs);
 B2 = B2(internal_dofs,internal_dofs);
-save("A1.mat",'A1')
-save("A2.mat",'A2')
-save("B1.mat",'B1')
-save("B2.mat",'B2')
 
 AIB = A(internal_dofs, boundary_dofs);                                                               %Matrix internal - boundary
 fI  = f_global(internal_dofs);                                                                       %Interior load term 

@@ -1,17 +1,17 @@
-% vem_lighting: This function computes the numerical solution of the PDE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION: vem_lighting
+%
+% Created by : M. Trezzi
+%
+%---------------------------------------------------------------------------------------------------
+% Purpose
+% =======
+% vem_lighting: this function computes the numerical solution of the pde
 % -eps * div(grad(u)) + beta * grad(u) + sigma * u = f
-% using virtual element method (VEM).
+% using virtual element method (vem).
 %
-% The basis functions of the virtual element space are computed using the lighting technique.
-%
-% The user can set the parameters of the PDE in lines 29-32.
-%
-% The test problem is set in line 43.
-% 
-% The mesh is selected in line 61. The meshes are constructed using VEMLAB 2.4  
-% (https://camlab.cl/software/vemlab/) and the functions plot_mesh2d and
-% read_mesh are from that software.
-
+% the basis functions of the virtual element space are computed using the lighting technique.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% INITIALIZATION
 clear; close; clc;
 
@@ -112,6 +112,3 @@ fprintf('[%.2f] Computing errors...\n',toc);
 fprintf("\n[%.2f] Errors computed: ",toc)
 fprintf("\nL2 norm    : %f", errL2)
 fprintf("\nH1 seminorm: %f\n", errH1)
-
-save("A.mat",'AII')
-save("B.mat",'MII')

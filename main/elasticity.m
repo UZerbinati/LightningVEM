@@ -132,11 +132,3 @@ end
 
 axis([0 1 0 1])
 axis("square")
-
-[VI,eigen] = eigs(AII,MII,20,'smallestabs');
-%h+)!$Q99$mzXCdT
-
-V(internal_dofs) = VI(:,1);
-V(boundary_dofs) = 0;
-
-eigen = diag(eigen)
