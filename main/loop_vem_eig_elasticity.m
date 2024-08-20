@@ -179,6 +179,7 @@ hold on
 loglog(diamVec,errPoisson(:,3), 'r*-','LineWidth',2, 'MarkerSize', 10)
 loglog(diamVec,errPoisson(:,5),'b*-','LineWidth',2, 'MarkerSize', 10)
 loglog(diamVec,errPoisson(:,7),'m*-','LineWidth',2, 'MarkerSize', 10)
+loglog(diamVec,300*diamVec.^2,'g:', 'LineWidth', 2)
 grid on
 axis square
 legend('$\nu=0.2$', '$\nu=0.3$', '$\nu=0.4$', '$\nu=0.4999$', 'interpreter', 'latex')

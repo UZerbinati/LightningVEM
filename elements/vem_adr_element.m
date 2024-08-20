@@ -106,11 +106,11 @@ Pi      = D * Pi0;
 I       = eye(polygon.size);
 Iminus  = I - Pi;                                                                                    %Stabilization term                   
 
-B2_loc = polygon.area*Iminus' * Iminus;
+B2_loc = polygon.area*(Iminus' * Iminus);
 
 %% CONSTRUCT f_local
 f_local   = zeros(polygon.size,1);                                                                   %Memory allocation
-f_val_int = f_evaluation_interior(f, p_quad);                                                       %evaluation of f on the quadrature nodes
+f_val_int = f_evaluation_interior(f, p_quad);                                                        %evalutation of f on the quadrature nodes
 
 for i=1:polygon.size
     

@@ -1,17 +1,17 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FUNCTION: vem_lighting
-%
-% Created by : M. Trezzi
-%
-%---------------------------------------------------------------------------------------------------
-% Purpose
-% =======
-% vem_lighting: this function computes the numerical solution of the pde
+% vem_lighting: This function computes the numerical solution of the PDE
 % -eps * div(grad(u)) + beta * grad(u) + sigma * u = f
-% using virtual element method (vem).
+% using virtual element method (VEM).
 %
-% the basis functions of the virtual element space are computed using the lighting technique.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The basis functions of the virtual element space are computed using the lighting technique.
+%
+% The user can set the parameters of the PDE in lines 29-32.
+%
+% The test problem is set in line 43.
+% 
+% The mesh is selected in line 61. The meshes are constructed using VEMLAB 2.4  
+% (https://camlab.cl/software/vemlab/) and the functions plot_mesh2d and
+% read_mesh are from that software.
+
 %% INITIALIZATION
 clear; close; clc;
 
@@ -26,8 +26,8 @@ fprintf('\n-eps * div(grad(u)) + beta * grad(u) + sigma * u = f')
 %% PARAMETERS OF THE PDE
 matProps.sigma   = 0;                                                                                %Reaction  coefficient
 matProps.epsilon = 1;                                                                                %Diffusion coefficient
-matProps.beta{1} = @(x,y) 0.*x + 0.*y;
-matProps.beta{2} = @(x,y) 0.*x + 0.*y;
+matProps.beta{1} = @(x,y) 0 + 0.*x + 0.*y;
+matProps.beta{2} = @(x,y) 0 + 0.*x + 0.*y;
 
 beta1      = func2str(matProps.beta{1});                                                             %Convert functions to string
 beta2      = func2str(matProps.beta{2});
@@ -40,24 +40,20 @@ disp(['Beta    = [ ' beta1 ' ; ' beta2 ' ]'])
 fprintf('Sigma   =  %.2f\n',matProps.sigma)
 
 %% DEFINITION OF THE FUNCTIONS
-[f, g, u, grad_u_x, grad_u_y] = problem_test_lighting(1,matProps);                                   %Obtain problem functions
+[f, g, u, grad_u_x, grad_u_y] = problem_test_lighting(4,matProps);                                   %Obtain problem functions
 
 %% INFORMATION ON THE POLYNOMIALS
-k = 1;                                                                                               %Degree of the polynomials used to solve the equation
+k = 3;                                                                                               %Degree of the polynomials used to solve the equation
 
 %polynomial = get_polynomial_info(k);
 fprintf('\nPolynomials degree for solving the equation: %d',k)
-
-if (k ~= 1)
-    error("Actually, the method only works with k = 1")
-end
 
 %% PRINT INIT MESSAGE TO SCREEN
 fprintf('\n\n[%.2f] Starting the method... \n',toc);
 
 %% READ THE MESH
 fprintf('[%.2f] Reading a mesh...\n',toc);
-mesh_filename = 'polygon_1024.txt';  
+mesh_filename = 'polygon_256.txt';  
 domainMesh    = read_mesh(mesh_filename);                                                            %Read mesh
 
 %% OBTAIN INFORMATION ON THE MESH
@@ -85,6 +81,8 @@ fprintf('[%.2f] Enforcing Dirichlet boundary conditions...\n',toc);             
 
 f_global(boundary_vertex)  = g(domainMesh.coords(boundary_vertex,1), ...                            
                                domainMesh.coords(boundary_vertex,2));
+f_global(boundary_intdofs) = g(domainMesh.intcoords(boundary_intdofs-domainMesh.nvertex,1), ...
+                                   domainMesh.intcoords(boundary_intdofs-domainMesh.nvertex,2));
 
 %% SOLVE THE SYSTEM
 fprintf('[%.2f] Solving system of linear equations...\n',toc);  
@@ -112,3 +110,17 @@ fprintf('[%.2f] Computing errors...\n',toc);
 fprintf("\n[%.2f] Errors computed: ",toc)
 fprintf("\nL2 norm    : %f", errL2)
 fprintf("\nH1 seminorm: %f\n", errH1)
+
+% save("A.mat",'AII')
+% save("B.mat",'MII')
+
+%% PLOT
+connect = domainMesh.connect;
+coords  = domainMesh.coords;
+
+figure(1)
+for i = 1:domainMesh.npolygon
+    hold on
+    fill3( coords(connect{i},1), coords(connect{i},2), U(connect{i}), mean(U(connect{i})))
+    axis square
+end

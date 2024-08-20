@@ -42,6 +42,8 @@ function [polygon] = get_polygon_info(vertex)
     polygon.centroid  = [0 0];                                                                       %Centroid
     polygon.diameter  = 0;                                                                           %Diameter of the polygon
     
+    polygon.dofs(:, 1:polygon.nedges) = vertex(1:end-1,:)';
+
     V = [vertex(end-1,:); vertex];
 
     for i=1:polygon.nedges

@@ -33,19 +33,16 @@ fprintf('Sigma   =  %.2f\n',matProps.sigma)
 [f, g, u, grad_u_x, grad_u_y] = problem_test_lighting(3,matProps);                                   %Obtain problem functions
 
 %% INFORMATION ON THE POLYNOMIALS
-k = 1;                                                                                               %Degree of the polynomials used to solve the equation
+k = 3;                                                                                               %Degree of the polynomials used to solve the equation
 
 %polynomial = get_polynomial_info(k);
 fprintf('\nPolynomials degree for solving the equation: %d',k)
 
-if (k ~= 1)
-    error("Actually, the method only works with k = 1")
-end
-
 %% INPUT OF THE MESH FILE NAME     
-%mesh = ["polygon_4.txt" "polygon_16.txt" "polygon_64.txt" "polygon_256.txt" "polygon_1024.txt"];
-mesh = ["star_1_0.1.txt" "star_2_0.1.txt" "star_4_0.1.txt" "star_8_0.1.txt" "star_16_0.1.txt"];
-%mesh = ["square_4.txt" "square_16.txt" "square_64.txt" "square_256.txt" "square_1024.txt" "polygon_4096.txt" ];
+mesh = ["polygon_4.txt" "polygon_16.txt" "polygon_64.txt" ]%"polygon_256.txt" "polygon_1024.txt"];
+%mesh = ["polygon_64.txt" "polygon_256.txt" "polygon_1024.txt"];
+%mesh = ["star_1_0.1.txt" "star_2_0.1.txt" "star_4_0.1.txt" "star_8_0.1.txt" "star_16_0.1.txt"];
+%mesh = ["square_4.txt" "square_16.txt" "square_64.txt" "square_256.txt" ];
 %mesh = ["polygon_4.txt" "polygon_16.txt" "polygon_64.txt" "polygon_256.txt"];
 
 %% INITIALIZE MEMORY
@@ -83,7 +80,7 @@ domainMesh.internal_edges = setdiff(1:domainMesh.nedges, domainMesh.boundary_edg
                                                                        
 %% ASSEMBLYING DIFFUSION CONVECTION MATRIX
 fprintf('[%.2f] Assemblying element matrices...\n',toc); 
-[K_global, f_global, domainMesh] = vem_lighting_assembly(domainMesh, matProps, f, k);
+[K_global, ~, f_global, domainMesh] = vem_lighting_assembly(domainMesh, matProps, f, k);
 
 %% CONVERTING SYSTEM MATRIX TO A SPARSE MATRIX
 A = sparse(K_global);
@@ -93,6 +90,8 @@ fprintf('[%.2f] Enforcing Dirichlet boundary conditions...\n',toc);             
 
 f_global(boundary_vertex)  = g(domainMesh.coords(boundary_vertex,1), ...                            
                                domainMesh.coords(boundary_vertex,2));
+f_global(boundary_intdofs) = g(domainMesh.intcoords(boundary_intdofs-domainMesh.nvertex,1), ...
+                                   domainMesh.intcoords(boundary_intdofs-domainMesh.nvertex,2));
 
 %% SOLVE THE SYSTEM
 fprintf('[%.2f] Solving system of linear equations...\n',toc);  
@@ -136,12 +135,12 @@ end
 loglog(diamvec,errL2vec,'r*-','LineWidth',2, 'MarkerSize', 10)
 hold on
 loglog(diamvec,errH1vec,'b*-','LineWidth',2, 'MarkerSize', 10)
-loglog(diamvec,diamvec,'k--','LineWidth',2, 'MarkerSize', 10)
-loglog(diamvec,diamvec.^2/12,'k--','LineWidth',2, 'MarkerSize', 10)
-txt = texlabel('$O(h)$');   
-text(diamvec(end),diamvec(end)*0.7,txt,'interpreter','latex','HorizontalAlignment','center')
-txt = texlabel('$O(h^2)$');   
-text(diamvec(end),diamvec(end).^2/15*0.9,txt,'interpreter','latex','HorizontalAlignment','center')
+loglog(diamvec,diamvec.^k,'k--','LineWidth',2, 'MarkerSize', 10)
+loglog(diamvec,diamvec.^(k+1),'k--','LineWidth',2, 'MarkerSize', 10)
+% txt = texlabel('$O(h)$');   
+% text(diamvec(end),diamvec(end)*0.7,txt,'interpreter','latex','HorizontalAlignment','center')
+% txt = texlabel('$O(h^2)$');   
+% text(diamvec(end),diamvec(end).^k,txt,'interpreter','latex','HorizontalAlignment','center')
 grid on
 axis square
 legend("L2", "H1")

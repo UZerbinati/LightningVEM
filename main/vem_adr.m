@@ -47,7 +47,7 @@ opt.stabilization = "DofiDofi";
 [f, g, u, grad_u_x, grad_u_y] = problem_test(2,matProps);                                            %Obtain problem functions
 
 %% INFORMATION ON THE POLYNOMIALS
-k = 1;                                                                                               %Degree of the polynomials used to solve the equation
+k = 2;                                                                                               %Degree of the polynomials used to solve the equation
 
 polynomial = get_polynomial_info(k);
 fprintf('\nPolynomials degree for solving the equation: %d',k)
@@ -102,17 +102,22 @@ internal_dofs = setdiff(1:size(A1,1), boundary_dofs);                           
 A = A1 + A2;
 AII = A(internal_dofs,internal_dofs);                                                                %Matrix internal - internal
 
+
 A1 = A1(internal_dofs,internal_dofs);
 A2 = A2(internal_dofs,internal_dofs);
 B1 = B1(internal_dofs,internal_dofs);
 B2 = B2(internal_dofs,internal_dofs);
+save("A1.mat",'A1')
+save("A2.mat",'A2')
+save("B1.mat",'B1')
+save("B2.mat",'B2')
 
 AIB = A(internal_dofs, boundary_dofs);                                                               %Matrix internal - boundary
 fI  = f_global(internal_dofs);                                                                       %Interior load term 
 UB  = f_global(boundary_dofs);                                                                       %Force boundary values
 UI  = AII \ (fI - AIB * UB);                                                                         %Solve system
     
-U                = zeros(size(A,1),1);                                                           %Solution vector
+U                = zeros(size(A,1),1);                                                               %Solution vector
 U(internal_dofs) = UI;
 U(boundary_dofs) = UB;
 

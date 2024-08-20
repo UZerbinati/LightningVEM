@@ -25,7 +25,7 @@ fprintf('\n-eps * div(grad(u)) + beta * grad(u) + sigma * u = f')
 
 %% PARAMETERS OF THE PDE
 matProps.E      = 70;
-matProps.nu     = 0.4999;
+matProps.nu     = 0.1;
 matProps.mu     = matProps.E / (2 * (1 + matProps.nu));
 matProps.lambda = matProps.E * matProps.nu / ( (1 + matProps.nu) * (1 - 2*matProps.nu));
 
@@ -33,7 +33,7 @@ matProps.lambda = matProps.E * matProps.nu / ( (1 + matProps.nu) * (1 - 2*matPro
 % matProps.lambda = 1;
 
 %% DEFINITION OF THE FUNCTIONS
-[f1, f2, u1, u1_x, u1_y, u2, u2_x, u2_y] = problem_test_elasticity(4,matProps);                                   %Obtain problem functions
+[f1, f2, u1, u1_x, u1_y, u2, u2_x, u2_y] = problem_test_elasticity(4,matProps);                      %Obtain problem functions
 
 %% INFORMATION ON THE POLYNOMIALS
 k = 1;                                                                                               %Degree of the polynomials used to solve the equation
@@ -50,7 +50,7 @@ fprintf('\n\n[%.2f] Starting the method... \n',toc);
 
 %% READ THE MESH
 fprintf('[%.2f] Reading a mesh...\n',toc);
-mesh_filename = 'polygon_256.txt';  
+mesh_filename = 'polygon_64.txt';  
 domainMesh    = read_mesh(mesh_filename);                                                            %Read mesh
 
 %% OBTAIN INFORMATION ON THE MESH
@@ -132,3 +132,31 @@ end
 
 axis([0 1 0 1])
 axis("square")
+
+[VI,eigen] = eigs(AII,MII,20,'smallestabs');
+%h+)!$Q99$mzXCdT
+
+V(internal_dofs) = VI(:,1);
+V(boundary_dofs) = 0;
+
+eigen = diag(eigen)
+% figure(3)
+% for i = 1:domainMesh.npolygon
+%     hold on
+%     fill3( coords(connect{i},1), coords(connect{i},2), V(connect{i}), mean(V(connect{i})))
+% end
+% 
+% figure(4)
+% for i = 1:domainMesh.npolygon
+%     hold on
+%     fill3( coords(connect{i},1), coords(connect{i},2), V(connect{i}+domainMesh.nvertex), mean(V(connect{i}+domainMesh.nvertex)))
+% end
+
+% [X,Y] = meshgrid(0:0.05:1,0:0.05:1);
+% Z1 = u1(X,Y);
+% Z2 = u2(X,Y);
+% 
+% figure(3)
+% surf(X,Y,Z1)
+% figure(4)
+% surf(X,Y,Z2)

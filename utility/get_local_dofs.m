@@ -1,4 +1,4 @@
-function [local_dofs] = get_local_dofs(domainMesh, polynomial, index, local_vertex, local_edges)
+function [local_dofs, vertex, boundary_edges] = get_local_dofs(Mesh, k, index)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION: get_local_dofs
@@ -30,34 +30,49 @@ function [local_dofs] = get_local_dofs(domainMesh, polynomial, index, local_vert
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
 
-k = polynomial.k;                                                                                    %Degree of the polynomials
+i_vertex = Mesh.connect{index,1};
+i_edges  = get_edges(Mesh.edges, i_vertex);
+dimm     = (k-1)*k/2;                                                                            %Degree of the polynomials
 
-nvertex = numel(local_vertex);                                                                       %Number of vertex
-size    = nvertex * k + polynomial.int;                                                              %Size of the DOFs vector
+nv   = numel(i_vertex);                                                                              %Number of vertex
+size = nv * k + dimm;                                                               %Size of the DOFs vector
 
-local_dofs            = zeros(size,1);                                                               %Initialization            
-local_dofs(1:nvertex) = local_vertex;                                                                %The first DOFs are the indexes of the vertices
-local_vertex          = [local_vertex; local_vertex(1)];
+local_dofs       = zeros(size,1);                                                                    %Initialization            
+local_dofs(1:nv) = i_vertex;                                                                         %The first DOFs are the indexes of the vertices
+i_vertex         = [i_vertex; i_vertex(1)];
+
+boundary_edges = zeros(1, numel(i_edges));
 
 if (k > 1)
     
-    for i = 1:nvertex
+    for i = 1:nv
 
-        if (local_vertex(i) < local_vertex(i+1))
-            local_dofs(nvertex+1+(i-1)*(k-1):nvertex+i*(k-1)) = (domainMesh.nvertex ...                   %The second DOFs are associated to the pointwise values
-                                                              + 1 + (local_edges(i)-1)*(k-1):domainMesh.nvertex + local_edges(i)*(k-1));                  %on the interior of the edges
+        range = nv+1+(i-1)*(k-1):nv+i*(k-1);
+
+        if (i_vertex(i) < i_vertex(i+1))
+            
+            local_dofs(range) = Mesh.nvertex + ((i_edges(i)-1)*(k-1)+1 : i_edges(i)*(k-1));                           
+        
         else
-
-            local_dofs(nvertex+1+(i-1)*(k-1):nvertex+i*(k-1)) = (domainMesh.nvertex + local_edges(i)*(k-1):-1: ...                   %The second DOFs are associated to the pointwise values
-                                                              domainMesh.nvertex+ 1 + (local_edges(i)-1)*(k-1));                  %on the interior of the edges
+        
+            local_dofs(range) = Mesh.nvertex + ((i_edges(i)*(k-1) : -1 : (i_edges(i)-1)*(k-1)+1)); 
+       
         end
 
 
     end
     
-    local_dofs(nvertex*k+1 : end) = domainMesh.nvertex + domainMesh.nedges * (k-1) ...               %The third DOFs are associated to the moments in the 
-                                  + (index-1) * polynomial.int + (1:polynomial.int);                                          %interior of the domain
-end
+    local_dofs(nv*k+1 : end) = Mesh.nvertex + Mesh.nedges * (k-1) ...                                %The third DOFs are associated to the moments in the 
+                             + (index-1) * dimm + (1:dimm);        %interior of the domain
 
 end
 
+for i = 1:numel(i_edges)
+
+    boundary_edges(i) = ismember(i_edges(i), Mesh.boundary_edges);
+
+end
+
+vertex = Mesh.coords(i_vertex,:);
+
+end

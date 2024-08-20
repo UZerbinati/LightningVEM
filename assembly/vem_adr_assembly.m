@@ -43,12 +43,10 @@ domainMesh.diameter = 0;                                                        
 %% CONSTRUCT THE LINEAR SYTEM
 for i=1:domainMesh.npolygon
     
+    local_dofs   = get_local_dofs(domainMesh, polynomial.k, i);                                      %Get the DOFs indexes of the i-th polygon
     
-    local_vertex = domainMesh.connect{i,1};                                                          %Get the vertex indexes of the i-th polygon
-    local_edges  = get_edges(domainMesh.edges, domainMesh.connect{i,1});                             %Get the edge indexes of the i-th polygon
-    local_dofs   = get_local_dofs(domainMesh, polynomial, i, local_vertex, local_edges);             %Get the DOFs indexes of the i-th polygon
-    
-    [A1_loc, A2_loc, B1_loc, B2_loc, f_loc, polygon] = vem_adr_element(domainMesh, matProps, polynomial, i, f);               %Assembly local stiffness matrix and load term
+    [A1_loc, A2_loc, B1_loc, B2_loc, f_loc, polygon] = vem_adr_element(domainMesh, matProps,...
+                                                                       polynomial, i, f);            %Assembly local stiffness matrix and load term
                                                                        
     polygon.local_dofs    = local_dofs;                                                              %Store local_dofs in the struct polygon
     domainMesh.polygon{i} = polygon;                                                                 %Store the polygon information 
@@ -59,11 +57,11 @@ for i=1:domainMesh.npolygon
 
     end
     
-    A1(local_dofs, local_dofs) = A1(local_dofs, local_dofs) + A1_loc;                     %Update the matrix
+    A1(local_dofs, local_dofs) = A1(local_dofs, local_dofs) + A1_loc;                                %Update the matrix
     A2(local_dofs, local_dofs) = A2(local_dofs, local_dofs) + A2_loc;
     B1(local_dofs, local_dofs) = B1(local_dofs, local_dofs) + B1_loc;
     B2(local_dofs, local_dofs) = B2(local_dofs, local_dofs) + B2_loc;
-    f_global(local_dofs)             = f_global(local_dofs)             + f_loc;                     %Update the load term
+    f_global(local_dofs)       = f_global(local_dofs)       + f_loc;                                 %Update the load term
 end
 
 end

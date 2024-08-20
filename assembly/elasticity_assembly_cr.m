@@ -1,4 +1,4 @@
-function [K_global, M_global, f_global,domainMesh] = vem_lighting_assembly(domainMesh, matProps, f, k)
+function [K_global, M_global, f_global,domainMesh] = elasticity_assembly_cr(domainMesh, matProps, f1, f2, k)
 
 % vem_lighting_assembly: This function constructs the global matrix
 % associated to the discretization of the Advection-Diffusion-Equation with
@@ -16,7 +16,7 @@ function [K_global, M_global, f_global,domainMesh] = vem_lighting_assembly(domai
 % domainMesh: the updated structure.
 
 %% MEMORY ALLOCATION
-siz = domainMesh.nvertex + (k - 1)*domainMesh.nedges + (k-1)*k/2 * domainMesh.npolygon;              %Size of the linear system     
+siz = 2 * domainMesh.nvedges ;                                                                  %Size of the linear system     
 
 K_global = zeros(siz,siz);                                                                           %Memory allocation
 M_global = zeros(siz,siz);
@@ -29,24 +29,28 @@ connect  = domainMesh.connect;
 coords   = parallel.pool.Constant(domainMesh.coords);
 polygons = cell(domainMesh.npolygon,1);
 K_loc    = cell(domainMesh.npolygon,1);
+M_loc    = cell(domainMesh.npolygon,1);
 f_loc    = cell(domainMesh.npolygon,1);
 
 %% CONSTRUCT THE LINEAR SYTEM
-parfor i = 1:domainMesh.npolygon
+for i = 1:domainMesh.npolygon
    
     local_vertex = connect{i,1};                                                                     %Get the vertex indexes of the i-th polygon
 
     vertex = coords.Value(local_vertex,:);
 
-    [K_loc{i}, M_loc{i}, f_loc{i}, polygons{i}] = vem_lighting_element(vertex, matProps, f, k);      %Assembly local stiffness matrix and load term
+    [K_loc{i}, M_loc{i}, f_loc{i}, polygons{i}] = elasticity_element_cr(vertex, matProps, f1 ,f2, k);                %Assembly local stiffness matrix and load term
 
 end
 
 for i = 1:domainMesh.npolygon
     
-    polygons{i}.local_dofs = get_local_dofs(domainMesh, k, i);                                       %Store the polygon information 
-    local_dofs = polygons{i}.local_dofs;
+    local_vertex = connect{i,1};                                                                     %Indexes of the vertices of the i-th polygon
+    i_edges      = get_edges(Mesh.edges, local_vertex);
 
+    local_dofs = [i_edges; i_edges + domainMesh.nedges];
+    polygons{i}.local_dofs = local_dofs;                                                           %Store the polygon information 
+    
     if (polygons{i}.diameter > domainMesh.diameter)                                                  %Update the diameter of the mesh
 
         domainMesh.diameter = polygons{i}.diameter;

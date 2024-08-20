@@ -1,4 +1,4 @@
-function [vem_val] = vem_evalutation_interior(siz, u_vem, p_quad)
+function [vem_val] = vem_evaluation_interior(siz, u_vem, p_quad)
 
 % vem_evalutation_interior: this functions evaluates the vem basis function on
 %                           the quadrature nodes.

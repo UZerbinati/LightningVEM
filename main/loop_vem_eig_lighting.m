@@ -43,7 +43,7 @@ end
 
 %mesh = ["polygon_16.txt" "polygon_64.txt" "polygon_256.txt" "polygon_1024.txt"];
 %mesh = ["star_2_0.1.txt" "star_4_0.1.txt" "star_8_0.1.txt" "star_16_0.1.txt"];
-mesh = ["polygon_1024.txt"];
+mesh = ["polygon_256.txt"];
 
 %% INFORMATION ON THE EIGENVALUE PROBLEM
 eigExact = [2 5 5 8 10 10 13 13 17 17 18 20 20 25 25 26 26 29 29 32];
